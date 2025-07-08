@@ -15,7 +15,7 @@ Voice-IaC is a voice-controlled Infrastructure-as-Code (IaC) system built using 
 | Layer        | Tools / Services                       |
 |--------------|-----------------------------------------|
 | Voice Input  | Python (SpeechRecognition, PyAudio)     |
-| Processing   | Regex, normalization, keyword matching |
+| Processing   | normalization, keyword matching |
 | IaC Engine   | Terraform (AWS Provider)               |
 | Cloud Infra  | AWS (EC2, EBS)                         |
 | Integration  | Python subprocess for Terraform        |
