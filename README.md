@@ -80,6 +80,12 @@ pip install pyaudio
 - Runs `terraform destroy` safely after "yes" is spoken
 - Voice-controlled infrastructure teardown!
 
+### v1.0.2 – Backend State Management
+- Added backend state management using AWS S3 and DynamoDB
+- Ensures safer state storage and collaboration
+- Improved error handling and rollback support
+- Code structure optimized for maintainability
+
 ## License
 This project is for educational and prototype purposes only.
 
