@@ -47,12 +47,14 @@ voice-iac/
 - Terraform installed and in system PATH
 - AWS CLI installed and configured with valid credentials
 - Microphone enabled and working
+- An AWS account with permissions to create/destroy EC2 instances, and manage S3 & DynamoDB (for backend state)
 
 ## Python Dependencies
 
 ```bash
 pip install SpeechRecognition
 pip install pyaudio
+pip install boto3
 ```
 ## Example Voice Commands
 - Create a t2.micro instance in ap-south-1 with 8GB
@@ -79,6 +81,12 @@ pip install pyaudio
 - Prompts for **voice confirmation** before destruction
 - Runs `terraform destroy` safely after "yes" is spoken
 - Voice-controlled infrastructure teardown!
+
+### v1.0.2 – Backend State Management
+- Added backend state management using AWS S3 and DynamoDB
+- Ensures safer state storage and collaboration
+- Improved error handling and rollback support
+- Code structure optimized for maintainability
 
 ## License
 This project is for educational and prototype purposes only.
