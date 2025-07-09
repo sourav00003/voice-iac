@@ -1,0 +1,26 @@
+
+# Python
+__pycache__/
+*.py[cod]
+*.log
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*.backup
+terraform.tfvars
+.terraform.lock.hcl
+
+# System
+.DS_Store
+Thumbs.db
+
+# Environment or credentials
+.env
+credentials.csv
+
+# Editor folders
+.vscode/
+.idea/
