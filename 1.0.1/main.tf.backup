@@ -1,0 +1,21 @@
+provider "aws" {
+  region = "__REGION__"
+}
+
+resource "aws_instance" "voice_instance" {
+  ami           = "__AMI__"
+  instance_type = "__INSTANCE_TYPE__"
+
+  root_block_device {
+    volume_size = __VOLUME_SIZE__
+  }
+
+  tags = {
+    Name = "iacvoice"
+  }
+}
+
+output "instance_ip" {
+  value = aws_instance.voice_instance.public_ip
+  description = "The public IP of the EC2 instance"
+}
