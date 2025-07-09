@@ -57,12 +57,28 @@ pip install pyaudio
 ## Example Voice Commands
 - Create a t2.micro instance in ap-south-1 with 8GB
 - Launch a t3.small instance in us-west-2 with 10GB
-- Destroy instance in us-east-1 (feature coming soon)
+- Destroy instance in us-east-1 (From V1.0.1)
 
 ##  Notes
 - Only predefined EC2 instance types and AWS regions are supported in the current version.
 - The destroy command functionality will be added in upcoming versions.
 - Ensure Terraform is installed and available in your system's PATH.
+
+## Features by Version
+###  v1.0.0 – Initial Release
+- Voice-to-text using `speech_recognition`
+- Extracts key EC2 parameters from voice:
+  - Instance type (e.g., t2.micro)
+  - Region (e.g., ap-south-1)
+  - Volume size (e.g., 10 GB)
+- Generates `main.tf` dynamically from a backup template
+- Runs `terraform init` and `terraform apply`
+
+###  v1.0.1 – Destroy Feature Added
+- Recognizes **destroy**, **terminate**, or **delete** keywords
+- Prompts for **voice confirmation** before destruction
+- Runs `terraform destroy` safely after "yes" is spoken
+- Voice-controlled infrastructure teardown!
 
 ## License
 This project is for educational and prototype purposes only.
