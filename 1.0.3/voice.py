@@ -231,7 +231,7 @@ def generate_main_tf_from_backup(params):
     ssh_required = "yes" in ssh_answer.lower()
 
     if ssh_required:
-        # 🔑 Create key and get key name
+        # Create key and get key name
         key_name = create_key_pair()
         sg_block = '''
 resource "aws_security_group" "ssh_sg" {
@@ -297,7 +297,7 @@ def run_terraform():
 
         print("Terraform apply completed.")
 
-        print("📡 Fetching instance public IP...")
+        print("Fetching instance public IP...")
         output = subprocess.check_output(["terraform", "output", "instance_ip"], text=True)
         public_ip = output.strip()
         print(f"EC2 Public IP: {public_ip}")
@@ -347,11 +347,11 @@ def parse_backend_config(file_path="main.tf.backup"):
                 bucket = line.split("=")[1].strip().strip('"')
             elif line.startswith("key"):
                 value = line.split("=")[1].strip().strip('"')
-                # 🚫 Skip placeholder
+                # Skip placeholder
                 if "__KEY_NAME__" not in value:
                     key = value
 
-    # 🛡️ Fallback default if placeholder still present
+    # Fallback default if placeholder still present
     if not key:
         key = "ec2/terraform.tfstate"
 
@@ -399,10 +399,10 @@ def run_terraform_destroy():
             else:
                 print("Keeping state file in S3.")
 
-            # 🗝️ Clean up AWS key pair
+            # Clean up AWS key pair
             delete_key_pair("voiceiac-key")
 
-            # 🧹 Clean up local .pem file
+            # Clean up local .pem file
             cleanup_pem_file("voiceiac-key")
         else:
             print("Destroy operation cancelled.")
