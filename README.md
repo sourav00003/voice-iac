@@ -12,13 +12,14 @@ Voice-IaC is a voice-controlled Infrastructure-as-Code (IaC) system built using 
 - Destroy functionality planned for future version
 
 ## Project Structure
+```bash
 voice-iac/
 └── 1.0.0/
     ├── voice.py               # Main Python script
     ├── main.tf.backup         # Terraform template with placeholders
     ├── main.tf                # Auto-generated Terraform config
     ├── .gitignore             # Ignore Terraform and Python cache files
-
+```
 ## How It Works
 1. User speaks a natural language command:
    Create a t2.micro instance in us-east-1 with 8GB volume
