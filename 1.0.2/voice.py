@@ -5,6 +5,7 @@ import boto3
 import botocore
 
 
+
 def voice_to_text():
     recognizer = sr.Recognizer()
 
