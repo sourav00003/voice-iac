@@ -1,25 +1,51 @@
-
-# Python
+# === Python ===
 __pycache__/
 *.py[cod]
+*.pyo
+*.pyd
+.venv/
+.env
 *.log
 
-# Terraform
-.terraform/
+# === VSCode / IDE ===
+.vscode/
+.idea/
+
+# === Terraform ===
 *.tfstate
 *.tfstate.*
-crash.log
+.terraform/
 terraform.tfvars
-.terraform.lock.hcl
+terraform.tfvars.json
 
-# System
+# === Ansible ===
+*.retry
+*.orig
+ansible/playbook/inventory.yaml
+ansible/playbook/site.yaml
+
+# === AWS ===
+*.pem
+
+# === Temp Files ===
+temp_terraform.tfstate
+*.bak
+*.tmp
+
+# === OS ===
 .DS_Store
 Thumbs.db
 
-# Environment or credentials
-.env
-credentials.csv
+# === Logs or local debug ===
+logs/
+*.log
+*.stderr
+*.stdout
 
-# Editor folders
-.vscode/
-.idea/
+# === Zip backups ===
+*.zip
+
+# === Test Artifacts ===
+test_output/
+coverage/
+__tests__/
