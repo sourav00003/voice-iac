@@ -1,0 +1,4 @@
+bucket: voiceiac-tf-state
+key: ec2/terraform.tfstate
+region: us-east-1
+dynamodb_table: voiceiac-tf-locks

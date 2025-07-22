@@ -1,0 +1,5 @@
+bucket: customiac
+key: custom/terraform.tfstate
+region: us-east-1
+dynamodb_table: custom-tf-locks
+

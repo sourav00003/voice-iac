@@ -1,0 +1,46 @@
+# Objective
+#objective: create  # or destroy
+action: destroy #create   # or destroy
+
+# Basic infrastructure metadata
+region: us-east-1
+key_name: custom-key
+
+# Leave these two out or empty
+vpc_id: ""  #vpc-057c850d38e0ae18a
+vpc_custom_file: vpc_custom.yaml
+
+
+# EC2 instance configurations
+instances:
+  - name: app-server-1
+    instance_type: t2.micro
+    ami: auto                     # or specify AMI ID like ami-0abcdef1234567890
+    volume_size: 8               # in GB
+    volume_type: gp2             # gp2, gp3, io1, etc.
+    security_group: custom_sg   #, web_sg   # Multiple SGs allowed, comma-separated
+    number: 2                    # Number of identical EC2 instances to create
+
+  - name: app-server-2
+    instance_type: t2.micro
+    ami: auto
+    volume_size: 8
+    volume_type: gp3
+    security_group: custom_sg
+    number: 2
+
+
+
+
+# Optional future block for Ansible config or Load Balancer
+# configuration:
+#   ansible:
+#     install_packages:
+#       - nginx
+#       - git
+#   load_balancer:
+#     enable: true
+#     type: application
+#     target_instances:
+#       - app-server-1
+#       - app-server-2

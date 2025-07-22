@@ -1,0 +1,27 @@
+---
+- name: Configure instance using Ansible
+  hosts: all
+  become: true
+  tasks:
+
+  {% for pkg in utilities %}
+  - name: Install utility {{ pkg }}
+    apt:
+      name: {{ pkg }}
+      state: present
+
+  {% endfor %}
+
+  {% for svc in services %}
+  - name: Install service {{ svc }}
+    apt:
+      name: {{ svc }}
+      state: present
+
+  - name: Start and enable service {{ svc }}
+    service:
+      name: {{ svc }}
+      state: started
+      enabled: true
+
+  {% endfor %}

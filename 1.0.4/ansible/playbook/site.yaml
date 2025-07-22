@@ -1,0 +1,45 @@
+---
+- name: Configure instance using Ansible
+  hosts: all
+  become: true
+  tasks:
+
+  
+  - name: Install utility git
+    apt:
+      name: git
+      state: present
+
+  
+  - name: Install utility curl
+    apt:
+      name: curl
+      state: present
+
+  
+
+  
+  - name: Install service nginx
+    apt:
+      name: nginx
+      state: present
+
+  - name: Start and enable service nginx
+    service:
+      name: nginx
+      state: started
+      enabled: true
+
+  
+  - name: Install service mysql-server
+    apt:
+      name: mysql-server
+      state: present
+
+  - name: Start and enable service mysql-server
+    service:
+      name: mysql-server
+      state: started
+      enabled: true
+
+  

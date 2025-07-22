@@ -1,0 +1,13 @@
+vpc_name: default-like-vpc
+cidr_block: 172.31.0.0/16
+enable_dns_support: true
+enable_dns_hostnames: true
+
+
+subnets:
+  - name: public_a
+    cidr_block: 172.31.0.0/20
+    az: us-east-1a
+  - name: public_b
+    cidr_block: 172.31.16.0/20
+    az: us-east-1b

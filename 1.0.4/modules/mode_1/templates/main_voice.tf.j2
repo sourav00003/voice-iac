@@ -1,0 +1,68 @@
+terraform {
+  backend "s3" {
+    bucket         = "{{ backend_bucket }}"
+    key            = "{{ backend_key }}"
+    region         = "{{ backend_region }}"
+    encrypt        = true
+    dynamodb_table = "{{ dynamodb_table }}"
+  }
+}
+
+provider "aws" {
+  region = "{{ region }}"
+}
+
+{% for sg in security_groups %}
+resource "aws_security_group" "{{ sg.name }}" {
+  name        = "{{ sg.name }}"
+  description = "{{ sg.description }}"
+
+  {% for rule in sg.ingress %}
+  ingress {
+    from_port   = {{ rule.port }}
+    to_port     = {{ rule.port }}
+    protocol    = "{{ rule.protocol }}"
+    cidr_blocks = ["{{ rule.cidr }}"]
+  }
+  {% endfor %}
+
+  {% for rule in sg.egress %}
+  egress {
+    from_port   = {{ rule.port }}
+    to_port     = {{ rule.port }}
+    protocol    = "{{ rule.protocol }}"
+    cidr_blocks = ["{{ rule.cidr }}"]
+  }
+  {% endfor %}
+}
+{% endfor %}
+
+resource "aws_instance" "myec2" {
+  ami           = "{{ ami }}"
+  instance_type = "{{ instance_type }}"
+
+  root_block_device {
+    volume_size = {{ volume_size }}
+  }
+
+  {% if key_name %}
+  key_name = "{{ key_name }}"
+  {% endif %}
+
+  {% if security_groups %}
+  vpc_security_group_ids = [
+    {% for sg in security_groups %}
+      aws_security_group.{{ sg.name }}.id{% if not loop.last %}, {% endif %}
+    {% endfor %}
+  ]
+  {% endif %}
+
+  tags = {
+    Name = "voiceiac-instance"
+  }
+}
+
+output "instance_ip" {
+  value       = aws_instance.myec2.public_ip
+  description = "The public IP of the EC2 instance"
+}

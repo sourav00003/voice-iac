@@ -1,0 +1,56 @@
+terraform {
+  backend "s3" {
+    bucket         = "{{ backend.bucket }}"
+    key            = "{{ backend.key }}"
+    region         = "{{ backend.region }}"
+    dynamodb_table = "{{ backend.dynamodb_table }}"
+  }
+}
+
+provider "aws" {
+  region = "{{ region }}"
+}
+
+resource "aws_security_group" "{{ security_group.name }}" {
+  name        = "{{ security_group.name }}"
+  description = "{{ security_group.description }}"
+  vpc_id      = "{{ vpc_id }}"
+
+  {% for rule in security_group.ingress %}
+  ingress {
+    from_port   = {{ rule.from_port }}
+    to_port     = {{ rule.to_port }}
+    protocol    = "{{ rule.protocol }}"
+    cidr_blocks = {{ rule.cidr_blocks }}
+  }
+  {% endfor %}
+
+  {% for rule in security_group.egress %}
+  egress {
+    from_port   = {{ rule.from_port }}
+    to_port     = {{ rule.to_port }}
+    protocol    = "{{ rule.protocol }}"
+    cidr_blocks = {{ rule.cidr_blocks }}
+  }
+  {% endfor %}
+}
+
+{% for instance in instances %}
+resource "aws_instance" "{{ instance.name }}" {
+  ami                    = "{{ instance.ami }}"
+  instance_type          = "{{ instance.instance_type }}"
+  key_name               = "{{ key_name }}"
+  count                  = {{ instance.number }}
+  subnet_id              = "{{ subnet_id }}"
+  vpc_security_group_ids = [aws_security_group.{{ security_group.name }}.id]
+
+  root_block_device {
+    volume_size = {{ instance.volume_size }}
+    volume_type = "{{ instance.volume_type }}"
+  }
+
+  tags = {
+    Name = "{{ instance.name }}-${count.index}"
+  }
+}
+{% endfor %}

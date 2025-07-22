@@ -1,0 +1,54 @@
+provider "aws" {
+  region = "{{ region }}"
+}
+
+resource "aws_vpc" "default_like" {
+  cidr_block           = "172.31.0.0/16"
+  enable_dns_support   = true
+  enable_dns_hostnames = true
+
+  tags = {
+    Name = "default-like-vpc"
+  }
+}
+
+resource "aws_internet_gateway" "gw" {
+  vpc_id = aws_vpc.default_like.id
+
+  tags = {
+    Name = "default-like-igw"
+  }
+}
+
+{% for subnet in subnets %}
+resource "aws_subnet" "{{ subnet.name }}" {
+  vpc_id                  = aws_vpc.default_like.id
+  cidr_block              = "{{ subnet.cidr_block }}"
+  availability_zone       = "{{ subnet.az }}"
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "{{ subnet.name }}"
+  }
+}
+{% endfor %}
+
+resource "aws_route_table" "public_rt" {
+  vpc_id = aws_vpc.default_like.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.gw.id
+  }
+
+  tags = {
+    Name = "default-like-public-rt"
+  }
+}
+
+{% for subnet in subnets %}
+resource "aws_route_table_association" "{{ subnet.name }}_assoc" {
+  subnet_id      = aws_subnet.{{ subnet.name }}.id
+  route_table_id = aws_route_table.public_rt.id
+}
+{% endfor %}

@@ -1,0 +1,14 @@
+all:
+  hosts:
+    52.23.158.93:
+      ansible_user: ec2-user
+      ansible_ssh_private_key_file: /home/sourav/.ssh/custom-key.pem
+    34.201.146.11:
+      ansible_user: ec2-user
+      ansible_ssh_private_key_file: /home/sourav/.ssh/custom-key.pem
+    13.217.29.82:
+      ansible_user: ec2-user
+      ansible_ssh_private_key_file: /home/sourav/.ssh/custom-key.pem
+    54.210.201.20:
+      ansible_user: ec2-user
+      ansible_ssh_private_key_file: /home/sourav/.ssh/custom-key.pem

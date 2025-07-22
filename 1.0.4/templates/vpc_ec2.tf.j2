@@ -1,0 +1,111 @@
+# Terraform backend configuration
+terraform {
+  backend "s3" {
+    bucket         = "{{ backend.bucket }}"
+    key            = "{{ backend.key }}"
+    region         = "{{ backend.region }}"
+    dynamodb_table = "{{ backend.dynamodb_table }}"
+  }
+}
+
+# AWS Provider
+provider "aws" {
+  region = "{{ region }}"
+}
+
+# VPC Resource
+resource "aws_vpc" "custom_vpc" {
+  cidr_block           = "{{ vpc_custom.cidr_block }}"
+  enable_dns_support   = {{ vpc_custom.enable_dns_support | lower }}
+  enable_dns_hostnames = {{ vpc_custom.enable_dns_hostnames | lower }}
+  tags = {
+    Name = "{{ vpc_custom.vpc_name }}"
+  }
+}
+
+# Internet Gateway
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.custom_vpc.id
+  tags = {
+    Name = "igw-{{ vpc_custom.vpc_name }}"
+  }
+}
+
+# Route Table
+resource "aws_route_table" "public_rt" {
+  vpc_id = aws_vpc.custom_vpc.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.igw.id
+  }
+  tags = {
+    Name = "public-rt-{{ vpc_custom.vpc_name }}"
+  }
+}
+
+# Subnets and Route Table Associations
+{% for subnet in vpc_custom.subnets %}
+resource "aws_subnet" "{{ subnet.name }}" {
+  vpc_id                  = aws_vpc.custom_vpc.id
+  cidr_block              = "{{ subnet.cidr_block }}"
+  availability_zone       = "{{ subnet.az }}"
+  map_public_ip_on_launch = true
+  tags = {
+    Name = "{{ subnet.name }}"
+  }
+}
+
+resource "aws_route_table_association" "{{ subnet.name }}_assoc" {
+  subnet_id      = aws_subnet.{{ subnet.name }}.id
+  route_table_id = aws_route_table.public_rt.id
+}
+{% endfor %}
+
+# Security Group
+resource "aws_security_group" "custom_sg" {
+  name        = "{{ security_group.name }}"
+  description = "{{ security_group.description }}"
+  vpc_id      = aws_vpc.custom_vpc.id
+
+{% for rule in security_group.ingress %}
+  ingress {
+    from_port   = {{ rule.from_port }}
+    to_port     = {{ rule.to_port }}
+    protocol    = "{{ rule.protocol }}"
+    cidr_blocks = [ {% for cidr in rule.cidr_blocks %}"{{ cidr }}"{% if not loop.last %}, {% endif %}{% endfor %} ]
+  }
+{% endfor %}
+
+
+{% for rule in security_group.egress %}
+  egress {
+    from_port   = {{ rule.from_port }}
+    to_port     = {{ rule.to_port }}
+    protocol    = "{{ rule.protocol }}"
+    cidr_blocks = [ {% for cidr in rule.cidr_blocks %}"{{ cidr }}"{% if not loop.last %}, {% endif %}{% endfor %} ]
+  }
+{% endfor %}
+
+}
+
+
+# EC2 Instances
+{% for instance in instances %}
+resource "aws_instance" "{{ instance.name }}" {
+  ami                         = "{{ instance.ami }}"
+  instance_type               = "{{ instance.instance_type }}"
+  key_name                    = "{{ key_name }}"
+  count                       = {{ instance.number }}
+  subnet_id                   = aws_subnet.{{ vpc_custom.subnets[loop.index0 % vpc_custom.subnets | length].name }}.id
+  vpc_security_group_ids      = [aws_security_group.custom_sg.id]
+
+  root_block_device {
+    volume_size = {{ instance.volume_size }}
+    volume_type = "{{ instance.volume_type }}"
+  }
+
+  tags = {
+    Name = "{{ instance.name }}-${count.index}"
+  }
+}
+{% endfor %}

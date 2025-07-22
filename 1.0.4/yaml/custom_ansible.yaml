@@ -1,0 +1,6 @@
+software_needed:
+  - git
+  - curl
+  - nginx
+  - mysql-server
+
