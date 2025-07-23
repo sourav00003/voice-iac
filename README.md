@@ -16,12 +16,46 @@ Voice-IaC is a voice-controlled Infrastructure-as-Code (IaC) system built using 
 
 ## Project Structure
 ```bash
-voice-iac/
-└── 1.0.0/
-    ├── voice.py               # Main Python script
-    ├── main.tf.backup         # Terraform template with placeholders
-    ├── main.tf                # Auto-generated Terraform config
-    ├── .gitignore             # Ignore Terraform and Python cache files
+1.0.4/
+├── ansible/
+│   ├── modules/
+│   └── playbook/
+│       ├── inventory.yaml             # Generated from TF state
+│       └── site.yaml                  # Rendered Ansible playbook
+├── backend/
+│   └── backend.yaml                   # S3 + DynamoDB backend config
+├── modules/
+│   ├── ec2_custom_generator.py        # Generates main.tf from YAML (Mode 2)
+│   ├── ec2_generator.py               # Used in Mode 1 (default VPC)
+│   ├── sg_generator.py                # (Legacy/global SG parser)
+│   ├── template_parser.py             # Parses custom.yaml for Mode 2
+│   ├── terraform_runner.py            # (Used for Mode 1)
+│   ├── utils/
+│   │   └── file_finder.py             # Utility for finding config/template files
+│   └── mode_1/
+│       ├── fetchami.py                # Fetches latest AMI ID (Amazon Linux 2)
+│       └── custom/
+│           ├── aws_utils.py              # Manages key pair, subnet/VPC fetch
+│           ├── complete_parser.py        # Parses all YAMLs + SG + backend + VPC
+│           ├── ec2_only_generator.py     # For Option 1 & 2 (default/existing VPC)
+│           ├── vpc_ec2_generator.py      # For Option 3 (custom VPC + EC2s)
+│           ├── sg_generator.py           # Parses `custom_sg_rules.txt`
+│           ├── vpc_checker.py            # Validates if a VPC ID exists in AWS
+│           └── main_generator.py         # (May orchestrate Mode 1 from YAML)
+├── templates/
+│   ├── main.tf.j2                    # Template for EC2-only TF (default/existing VPC)
+│   ├── vpc_ec2.tf.j2                 # Template for full infra with custom VPC
+│   └── playbook.j2                   # Template for Ansible playbook (site.yaml)
+├── yaml/
+│   ├── custom.yaml                   # User-defined infra config (instances, VPC, SG)
+│   ├── vpc_custom.yaml               # Custom VPC and subnet config
+│   └── custom_ansible.yaml           # Post-provision Ansible tasks
+├── main.py                           # Entry point (asks for Mode 1 or Mode 2)
+├── mode1_handler.py                  # Handles Mode 1 (voice-based provisioning)
+├── mode2_handler.py                  # Handles Mode 2 (YAML-based provisioning)
+├── terraform_runner2.py              # Executes Terraform for Mode 2
+├── custom_sg_rules.txt               # Optional SG rule file used in YAML SG creation
+├── test.py                           # Script to test SG parsing logic
 ```
 ## How It Works
 1. User speaks a natural language command:
@@ -137,6 +171,22 @@ pip install boto3
    - Prints public IP and SSH command after creation
  - Idempotent Infra Handling
    - Avoids duplicate key/SG creation on re-run
+
+### v1.0.4 – YAML-Based Infra + Ansible Automation
+- Introduced Mode 2: YAML-driven infrastructure provisioning
+- Supports:
+  - Custom VPC and subnet creation via vpc_custom.yaml
+  - EC2 instance + EBS volume provisioning via custom.yaml
+  - Inline and file-based Security Group rule parsing
+- Added objective: destroy support in YAML
+- Integrated Ansible for post-creation configuration:
+  - Converts Terraform state into inventory
+  - Renders playbook from Jinja2 template
+  - Runs remote config via SSH
+- Fully modular architecture via modules/mode_1/custom/
+- Jinja2-based templates for Terraform and Ansible
+- Automatic AMI resolution (ami: auto)
+- Terraform backend (S3 + DynamoDB) via backend.yaml
 
 ## License
 This project is for educational and prototype purposes only.
